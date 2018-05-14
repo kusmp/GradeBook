@@ -41,9 +41,6 @@ public class Server {
         Student a = new Student(student.getName(), student.getSurname(), student.getDayOfBirth(), student.getGrades());
         datastore.save(a);
 
-//        Student createdIndex = dataService.addStudent(student);
-//        Student a = new Student(student.getName(), student.getSurname(), student.getDayOfBirth(), student.getGrades(), createdIndex.getIndex());
-//        if (students.add(a))
             return Response.created(URI.create("/students/" + student.getIndex())).build();
 //        else return Response.status(Response.Status.BAD_REQUEST).build();
     }
@@ -55,11 +52,7 @@ public class Server {
     public Object getStudent(@PathParam("index") long index) {
         final Query<Student> query = datastore.createQuery(Student.class);
         Query<Student> studentQuery = query.field("index").equal(index);
-//        for (Student student : students) {
-//            if (student.getIndex() == index) {
-//                return student;
-//            }
-//        }
+
             return studentQuery.asList();
        // return Response.status(Response.Status.NOT_FOUND).build();
     }
@@ -69,41 +62,20 @@ public class Server {
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response updateStudent(@PathParam("index") long index, Student student) {
 
+
         Student a = new Student(student.getName(), student.getSurname(), student.getDayOfBirth(), student.getGrades());
         Student selectedStudent = studQuery.field("index").equal(index).get();
+
         UpdateOperations ops = datastore
                 .createUpdateOperations(Student.class)
                 .set("name", a.getName())
                 .set("surname", a.getSurname())
                 .set("dayOfBirth", a.getDayOfBirth())
-                .set("grades", a.getGrades())
+                .set("grades", selectedStudent.getGrades())
                 .set("index", index);
         datastore.update(selectedStudent, ops);
         return Response.status(Response.Status.OK).build();
 
-
-//        Student a = new Student(student.getName(), student.getSurname(), student.getDayOfBirth(), student.getGrades());
-//        List<Student> students = studQuery.asList();
-//        for(Student stud : students){
-//            if(stud.getIndex() == index){
-//                a.setIndex(index);
-//                int position = students.indexOf(stud);
-//                students.set(position, a);
-//               datastore.merge(students);
-//               return Response.status(Response.Status.OK).build();
-//            }
-//        }
-
-//        for (Student stud : students) {
-//            if (stud.getIndex() == index) {
-//                a.setIndex(index);
-//                int position;
-//                position = students.indexOf(stud);
-//                students.set(position, a);
-//                return Response.status(Response.Status.OK).build();
-//            }
-//        }
-      //  return Response.status(Response.Status.NOT_FOUND).build();
     }
 
     @DELETE
@@ -112,14 +84,6 @@ public class Server {
         Query<Student> removeStudent = studQuery.field("index").equal(index);
         datastore.delete(removeStudent);
 
-       // Iterator<Student> iterator = students.iterator();
-      //  while (iterator.hasNext()) {
-      //      Student next = iterator.next();
-       //     if (next.getIndex() == index) {
-      //          iterator.remove();
-      //          return Response.status(Response.Status.OK).build();
-         //   }
-      //  }
         return Response.status(Response.Status.OK).build();
     }
     ///////////////
@@ -130,11 +94,7 @@ public class Server {
     public List<Grade> getGrades(@PathParam("index") long index) {
         Student selectedStudent = studQuery.field("index").equal(index).get();
         List<Grade> grades = selectedStudent.getGrades();
-//        for (Student student : students) {
-//            if (student.getIndex() == index) {
-//                return student.getGrades();
-//            }
-//        }
+
         return grades;
     }
 
@@ -151,14 +111,7 @@ public class Server {
         updateOps = datastore.createUpdateOperations(Student.class).set("grades", grades);
         datastore.update(student, updateOps);
         return Response.status(Response.Status.CREATED).build();
-//        for (Student student : students) {
-//            if (student.getIndex() == index) {
-//                List<Grade> grades = student.getGrades();
-//                grades.add(grade);
-//                return Response.status(Response.Status.CREATED).build();
-//            }
-//        }
-//        return null;
+
     }
 
     @GET
@@ -172,15 +125,7 @@ public class Server {
                 return grd;
             }
         }
-//        for (Student student : students) {
-//            if (student.getIndex() == index) {
-//                for (Grade grade : student.getGrades()) {
-//                    if (grade.getId() == id) {
-//                        return grade;
-//                    }
-//                }
-//            }
-//        }
+
         return null;
     }
 
@@ -212,9 +157,11 @@ public class Server {
        List<Grade> grades = student.getGrades();
        for(Grade grd : grades){
            if(grd.getId() == id){
-               a.rewriteId(id);
                int position = grades.indexOf(grd);
+               a.rewriteId(id);
+               a.setCourse(grades.get(position).getCourse());
                grades.set(position, a);
+
                UpdateOperations<Student> updateOps;
                updateOps = datastore.createUpdateOperations(Student.class).set("grades", grades);
                datastore.update(student, updateOps);
@@ -222,21 +169,7 @@ public class Server {
            }
        }
 
-//        for (Student student : students) {
-//            if (student.getIndex() == index) {
-//                List<Grade> upgrad = student.getGrades();
-//                for (Grade grd : upgrad) {
-//                    if (grd.getId() == id) {
-//                        a.setId(id);
-//                        int position;
-//                        position = upgrad.indexOf(grd);
-//                        upgrad.set(position, a);
-//                        student.setGrades(upgrad);
-//                        return Response.status(Response.Status.OK).build();
-//                    }
-//                }
-//            }
-//        }
+
         return Response.status(Response.Status.NOT_FOUND).build();
     }
     ///////////////
@@ -256,10 +189,7 @@ public class Server {
 
         Course a = new Course(course.getName(), course.getLecturer());
         datastore.save(a);
-//        Long createdCourseId = dataService.addCourse(course);
-//        course.setId(createdCourseId);
-//        datastore.save(course);
-       // courses.add(course);
+
         return Response.status(Response.Status.CREATED).build();
     }
 
@@ -268,11 +198,7 @@ public class Server {
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Course getCourseById(@PathParam("id") long id) {
         Course course = courseQuery.field("id").equal(id).get();
-//        for (Course course : courses) {
-//            if (course.getId() == id) {
-//                return course;
-//            }
-//        }
+
         return course;
     }
 
@@ -283,14 +209,7 @@ public class Server {
         Query<Course> deleteCourse = courseQuery.field("id").equal(id);
         datastore.delete(deleteCourse);
 
-//        Iterator<Course> iterator = courses.iterator();
-//        while (iterator.hasNext()) {
-//            Course next = iterator.next();
-//            if (next.getId() == id) {
-//                iterator.remove();
-//                return Response.status(Response.Status.OK).build();
-//            }
-//        }
+
         return Response.status(Response.Status.OK).build();
     }
 
@@ -309,15 +228,7 @@ public class Server {
         datastore.update(selectedCourse, ops);
 
 
-//        for (Course cour : courses) {
-//            if (cour.getId() == id) {
-//                a.setId(id);
-//                int position;
-//                position = courses.indexOf(cour);
-//                courses.set(position, a);
-//                return Response.status(Response.Status.OK).build();
-//            }
-//        }
+
         return Response.status(Response.Status.OK).build();
     }
 
