@@ -9,6 +9,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -104,11 +105,17 @@ public class Server {
     public Response addGradeToStudent(@PathParam("index") long index, Grade grade) {
 
         Course selectedCourse = courseQuery.field("id").equal(grade.getCourse().getId()).get();
+       System.out.println(selectedCourse.getId());
+        List<Grade> grades;
         if(selectedCourse!=null){
             Student student = studQuery.field("index").equal(index).get();
-            List<Grade> grades = student.getGrades();
-            Grade a = new Grade(grade.getDate(), grade.getValue(), grade.getCourse());
+            if(student.getGrades() == null){
+                grades = new ArrayList<>();
+            }
+            else grades = student.getGrades();
+            Grade a = new Grade(grade.getDate(), grade.getValue());
             a.setCourse(selectedCourse);
+           System.out.println(a.getCourse().getName());
             grades.add(a);
             UpdateOperations<Student> updateOps;
             updateOps = datastore.createUpdateOperations(Student.class).set("grades", grades);

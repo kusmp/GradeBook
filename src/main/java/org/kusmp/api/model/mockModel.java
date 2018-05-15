@@ -104,8 +104,9 @@ public class mockModel {
         student = new Student("Maciej", "Wiśniewski", new Date("1994/9/18"), grades);
         students.add(student);
         grades =  new ArrayList<>();
-        ds.save(students);
         ds.save(courses);
+        ds.save(students);
+
 
         //ds.save(grades);
        // ds.save(courses);

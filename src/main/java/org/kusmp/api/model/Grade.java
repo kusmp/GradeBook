@@ -23,7 +23,7 @@ public class Grade {
     private long id;
     private Date date;
     private float value;
-   // @Reference
+    @Reference
     private Course course;
     static final AtomicLong count = new AtomicLong(0);
 
@@ -45,6 +45,12 @@ public class Grade {
         this.date = date;
         this.value = value;
         this.course = course;
+        this.id = count.incrementAndGet();
+    }
+
+    public Grade(Date date, float value) {
+        this.date = date;
+        this.value = value;
         this.id = count.incrementAndGet();
     }
 
