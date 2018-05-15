@@ -103,14 +103,19 @@ public class Server {
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response addGradeToStudent(@PathParam("index") long index, Grade grade) {
 
-        Student student = studQuery.field("index").equal(index).get();
-        List<Grade> grades = student.getGrades();
-        Grade a = new Grade(grade.getDate(), grade.getValue(), grade.getCourse());
-        grades.add(a);
-        UpdateOperations<Student> updateOps;
-        updateOps = datastore.createUpdateOperations(Student.class).set("grades", grades);
-        datastore.update(student, updateOps);
-        return Response.status(Response.Status.CREATED).build();
+        Course selectedCourse = courseQuery.field("id").equal(grade.getCourse().getId()).get();
+        if(selectedCourse!=null){
+            Student student = studQuery.field("index").equal(index).get();
+            List<Grade> grades = student.getGrades();
+            Grade a = new Grade(grade.getDate(), grade.getValue(), grade.getCourse());
+            a.setCourse(selectedCourse);
+            grades.add(a);
+            UpdateOperations<Student> updateOps;
+            updateOps = datastore.createUpdateOperations(Student.class).set("grades", grades);
+            datastore.update(student, updateOps);
+            return Response.status(Response.Status.CREATED).build();
+        } else return Response.status(Response.Status.NOT_FOUND).build();
+
 
     }
 
