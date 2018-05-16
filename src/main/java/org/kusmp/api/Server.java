@@ -1,5 +1,6 @@
 package org.kusmp.api;
 
+import org.kusmp.api.dao.StudentDAO;
 import org.kusmp.api.model.*;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.query.Query;
@@ -10,6 +11,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 
@@ -25,11 +27,16 @@ public class Server {
 
     // private final List<Grade> grades = mockModel.getGrades();
 
+
     ///////////////
     @GET
     @Path("/students")
     @Produces({MediaType.APPLICATION_JSON})
-    public List<Student> getStudentsList() {
+    public List<Student> getStudentsList(@QueryParam("name") String name,
+                                         @QueryParam("surname") String surname,
+                                         @QueryParam("date") Date date
+                                         ) {
+
         List<Student> listOfStudents = studQuery.asList();
         return listOfStudents;
     }
@@ -40,8 +47,8 @@ public class Server {
     public Response addStudent(Student student) {
 
         Student a = new Student(student.getName(), student.getSurname(), student.getDayOfBirth(), student.getGrades());
+        a.setIndex(StudentDAO.generateStudentIndex());
         datastore.save(a);
-
             return Response.created(URI.create("/students/" + student.getIndex())).build();
 //        else return Response.status(Response.Status.BAD_REQUEST).build();
     }
@@ -105,7 +112,7 @@ public class Server {
     public Response addGradeToStudent(@PathParam("index") long index, Grade grade) {
 
         Course selectedCourse = courseQuery.field("id").equal(grade.getCourse().getId()).get();
-       System.out.println(selectedCourse.getId());
+      // System.out.println(selectedCourse.getId());
         List<Grade> grades;
         if(selectedCourse!=null){
             Student student = studQuery.field("index").equal(index).get();
@@ -121,7 +128,7 @@ public class Server {
             updateOps = datastore.createUpdateOperations(Student.class).set("grades", grades);
             datastore.update(student, updateOps);
             return Response.status(Response.Status.CREATED).build();
-        } else return Response.status(Response.Status.NOT_FOUND).build();
+        } else return Response.status(Response.Status.NO_CONTENT).entity("No courses to assign").build();
 
 
     }
@@ -200,6 +207,7 @@ public class Server {
     public Response addCourse(Course course) {
 
         Course a = new Course(course.getName(), course.getLecturer());
+        a.setId(StudentDAO.generateCourseId());
         datastore.save(a);
 
         return Response.status(Response.Status.CREATED).build();
