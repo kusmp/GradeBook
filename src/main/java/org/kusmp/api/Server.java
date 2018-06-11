@@ -13,6 +13,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Path("/")
@@ -34,11 +35,39 @@ public class Server {
     @Produces({MediaType.APPLICATION_JSON})
     public List<Student> getStudentsList(@QueryParam("name") String name,
                                          @QueryParam("surname") String surname,
-                                         @QueryParam("date") Date date
+                                         @QueryParam("birthday") Date birthday,
+                                         @QueryParam("dateRelation") String dateRelation
                                          ) {
 
-        List<Student> listOfStudents = studQuery.asList();
-        return listOfStudents;
+        Query<Student> query = datastore.createQuery(Student.class);
+        //filtering by name
+        if(name != null){
+
+            query = query.field("name").containsIgnoreCase(name);
+        }
+
+        //filtering by surname
+        if(surname != null){
+            query = query.field("surname").containsIgnoreCase(surname);
+        }
+
+        //filtering by date
+        if (birthday != null && dateRelation != null) {
+            switch (dateRelation.toLowerCase()) {
+                case "equal":
+                    query.filter("birthday ==", birthday);
+                    break;
+                case "after":
+                    query.filter("birthday >", birthday);
+                    break;
+                case "before":
+                    query.filter("birthday <", birthday);
+                    break;
+            }
+        }
+
+
+        return query.asList();
     }
 
     @POST
@@ -46,7 +75,7 @@ public class Server {
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response addStudent(Student student) {
 
-        Student a = new Student(student.getName(), student.getSurname(), student.getDayOfBirth(), student.getGrades());
+        Student a = new Student(student.getName(), student.getSurname(), student.getBirthday(), student.getGrades());
         a.setIndex(StudentDAO.generateStudentIndex());
         datastore.save(a);
             return Response.created(URI.create("/students/" + student.getIndex())).build();
@@ -71,14 +100,14 @@ public class Server {
     public Response updateStudent(@PathParam("index") long index, Student student) {
 
 
-        Student a = new Student(student.getName(), student.getSurname(), student.getDayOfBirth(), student.getGrades());
+        Student a = new Student(student.getName(), student.getSurname(), student.getBirthday(), student.getGrades());
         Student selectedStudent = studQuery.field("index").equal(index).get();
 
         UpdateOperations ops = datastore
                 .createUpdateOperations(Student.class)
                 .set("name", a.getName())
                 .set("surname", a.getSurname())
-                .set("dayOfBirth", a.getDayOfBirth())
+                .set("birthday", a.getBirthday())
                 .set("grades", selectedStudent.getGrades())
                 .set("index", index);
         datastore.update(selectedStudent, ops);
@@ -99,9 +128,28 @@ public class Server {
     @GET
     @Path("/students/{index}/grades")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public List<Grade> getGrades(@PathParam("index") long index) {
+    public List<Grade> getGrades(@PathParam("index") long index,
+                                 @QueryParam("course") String course,
+                                 @QueryParam("value") String value,
+                                 @QueryParam("valueRelation") String valueRelation) {
         Student selectedStudent = studQuery.field("index").equal(index).get();
         List<Grade> grades = selectedStudent.getGrades();
+        if (course != null) {
+            grades = grades.stream().filter(gr -> gr.getCourse().getName().equals(course)).collect(Collectors.toList());
+        }
+
+        if (value != null && valueRelation != null) {
+            switch (valueRelation.toLowerCase()) {
+                case "greater":
+                    grades = grades.stream().filter(gr -> gr.getValue() > Float.valueOf(value).floatValue()).collect(Collectors.toList());
+                    break;
+                case "lower":
+                    grades = grades.stream().filter(gr -> gr.getValue() < Float.valueOf(value).floatValue()).collect(Collectors.toList());
+                    break;
+            }
+        }
+
+
 
         return grades;
     }
@@ -196,9 +244,16 @@ public class Server {
     @GET
     @Path("/courses")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public List<Course> returnCourses() {
+    public List<Course> returnCourses(@QueryParam("lecturer") String lecturer) {
+
+        final Query<Course> query = datastore.createQuery(Course.class);
+        if (lecturer != null)
+            query.field("lecturer").containsIgnoreCase(lecturer);
+        return query.asList();
+
+
       //  return courses;
-        return courseQuery.asList();
+        //return courseQuery.asList();
     }
 
     @POST
@@ -225,6 +280,21 @@ public class Server {
     @DELETE
     @Path("/courses/{id}")
     public Response deleteCourse(@PathParam("id") long id) {
+
+        List<Student> students = studQuery.asList();
+
+        for(Student student : students){
+            List<Grade> grades = student.getGrades();
+            for(int i=0; i<student.getGrades().size(); i++){
+                if(student.getGrades().get(i).getCourse().getId() == id){
+                    grades.remove(student.getGrades().get(i));
+                    UpdateOperations<Student> updateOps;
+                    updateOps = datastore.createUpdateOperations(Student.class).set("grades", grades);
+                    datastore.update(student, updateOps);
+                    return Response.status(Response.Status.OK).build();
+                }
+            }
+        }
 
         Query<Course> deleteCourse = courseQuery.field("id").equal(id);
         datastore.delete(deleteCourse);

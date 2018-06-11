@@ -29,7 +29,7 @@ public class Student {
     private String name;
     private String surname;
     @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd", timezone="CET")
-    private Date dayOfBirth;
+    private Date birthday;
     @Embedded
     private List<Grade> grades;
     @XmlTransient
@@ -54,21 +54,21 @@ public class Student {
     public Student() {
     }
 
-    public Student(String name, String surname, Date dayOfBirth, List<Grade> grades, long index) {
+    public Student(String name, String surname, Date birthday, List<Grade> grades, long index) {
         index = IDtemp++;
         this.name = name;
         this.surname = surname;
-        this.dayOfBirth = dayOfBirth;
+        this.birthday = birthday;
         this.grades = grades;
         this.index = count.getAndIncrement();
     }
 
 
-    public Student(String name, String surname, Date dayOfBirth, List<Grade> grades) {
+    public Student(String name, String surname, Date birthday, List<Grade> grades) {
        // index = IDtemp++;
         this.name = name;
         this.surname = surname;
-        this.dayOfBirth = dayOfBirth;
+        this.birthday = birthday;
         this.grades = grades;
         this.index = count.getAndIncrement();
     }
@@ -101,12 +101,12 @@ public class Student {
     }
 
     @XmlElement
-    public Date getDayOfBirth() {
-        return dayOfBirth;
+    public Date getBirthday() {
+        return birthday;
     }
 
-    public void setDayOfBirth(Date dayOfBirth) {
-        this.dayOfBirth = dayOfBirth;
+    public void setBirthday(Date birthday) {
+        this.birthday = birthday;
     }
 
     @XmlElement

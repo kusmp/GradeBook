@@ -20,6 +20,7 @@ public class Main {
                 .packages("org.glassfish.jersey.examples.linking")
                 .register(DeclarativeLinkingFeature.class)
                 .register(RestError.class)
+                .register(DateParamConverterProvider.class)
                 .registerClasses(AuthFilter.class);
 
       //  final ResourceConfig rc = new ResourceConfig().packages("org.kusmp.api");
