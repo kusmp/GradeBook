@@ -1,6 +1,7 @@
 package org.kusmp.api.model;
 
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.glassfish.jersey.linking.InjectLink;
 import org.glassfish.jersey.linking.InjectLinks;
@@ -21,6 +22,7 @@ public class Grade {
 
    // private UUID uuid = UUID.randomUUID();
     private long id;
+    @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd", timezone="CET")
     private Date date;
     private float value;
     @Reference

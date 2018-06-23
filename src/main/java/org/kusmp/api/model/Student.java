@@ -14,6 +14,7 @@ import org.mongodb.morphia.annotations.Indexed;
 import javax.ws.rs.core.Link;
 import javax.xml.bind.annotation.*;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
@@ -31,10 +32,10 @@ public class Student {
     @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd", timezone="CET")
     private Date birthday;
     @Embedded
-    private List<Grade> grades;
+    private List<Grade> grades = new ArrayList<>();
     @XmlTransient
     @Id
-    @XmlJavaTypeAdapter(ObjectIdJaxbAdapter.class)
+   // @XmlJavaTypeAdapter(ObjectIdJaxbAdapter.class)
     ObjectId id;
 
    static final AtomicLong count = new AtomicLong(100);
@@ -147,12 +148,35 @@ public class Student {
         Student.IDtemp = IDtemp;
     }
 
-    public List<Link> getLinks() {
-        return links;
+//    public List<Link> getLinks() {
+//        return links;
+//    }
+//
+//    public void setLinks(List<Link> links) {
+//        this.links = links;
+//    }
+
+    public Grade findGradeById(long id) {
+        for(Grade g : grades){
+            if(g.getId() == id){
+                return g;
+            }
+        }
+        return null;
     }
 
-    public void setLinks(List<Link> links) {
-        this.links = links;
+    public void updateGrade(long id, Grade grade) throws Exception {
+        Grade g = findGradeById(id);
+        if (g == null) {
+            throw new Exception("Grade with id=" + id + " for student with index=" + index + " don't exist");
+        }
+        g.setCourse(grade.getCourse());
+        g.setDate(grade.getDate());
+        g.setValue(grade.getValue());
     }
+
+
+
+
 }
 

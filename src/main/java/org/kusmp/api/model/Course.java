@@ -5,6 +5,7 @@ import org.bson.types.ObjectId;
 import org.glassfish.jersey.linking.InjectLink;
 import org.glassfish.jersey.linking.InjectLinks;
 import org.kusmp.api.ObjectIdJaxbAdapter;
+import org.kusmp.api.dao.StudentDAO;
 import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
 
@@ -22,10 +23,10 @@ public class Course {
     private static long increment =1;
     private String name;
     private String lecturer;
-   // private static final AtomicLong counter = new AtomicLong(100);
-    @XmlTransient
+    // private static final AtomicLong counter = new AtomicLong(100);
     @Id
-    @XmlJavaTypeAdapter(ObjectIdJaxbAdapter.class)
+    @XmlTransient
+    //@XmlJavaTypeAdapter(ObjectIdJaxbAdapter.class)
     ObjectId ID;
 
     static final AtomicLong count = new AtomicLong(0);
@@ -41,15 +42,19 @@ public class Course {
     private List<Link> links;
 
     public Course() {
+
     }
 
     public Course(String name, String lecturer) {
-        id = count.incrementAndGet();
+
+       this.id = StudentDAO.generateCourseIndex();
+      //  id = count.incrementAndGet();
         this.name = name;
         this.lecturer = lecturer;
     }
 
     public Course(long id, String name, String lecturer) {
+       // StudentDAO.generateCourseIndex();
         this.id = count.incrementAndGet();
         this.name = name;
         this.lecturer = lecturer;
@@ -92,4 +97,3 @@ public class Course {
         this.ID = ID;
     }
 }
-

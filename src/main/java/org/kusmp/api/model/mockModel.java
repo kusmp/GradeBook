@@ -24,7 +24,7 @@ public class mockModel {
         Datastore ds = MorphiaHandler.getInstance().getDatastore();
         List<Grade> grades = new ArrayList<>();
         Grade tempGrade = new Grade();
-        courses.add(new Course(StudentDAO.generateCourseId(), "Matematyka", "Jan Kowalski"));
+        //courses.add(new Course(StudentDAO.generateCourseId(), "Matematyka", "Jan Kowalski"));
 //        courses.add((new Course("Fizyka", "Jan Nowak")));
 //        courses.add(new Course( "Chemia", "Piotr Kwiatkowski"));
 
@@ -33,7 +33,7 @@ public class mockModel {
         tempGrade.setId(10);
         tempGrade.setValue(4);
         tempGrade.setDate(new Date("2018/4/9"));
-        tempGrade.setCourse(courses.get(0));
+//        tempGrade.setCourse(courses.get(0));
         grades.add(tempGrade);
         tempGrade = new Grade();
         //
@@ -52,7 +52,7 @@ public class mockModel {
 //        tempGrade = new Grade();
         //
         Student student = new Student( "Patryk", "Kuśmierkiewicz", new Date("1995/2/15"), grades);
-        student.setIndex(StudentDAO.generateStudentIndex());
+        //student.setIndex(StudentDAO.generateStudentIndex());
         students.add(student);
         grades =  new ArrayList<>();
         /////////// student 2
@@ -107,8 +107,8 @@ public class mockModel {
 //        student.setIndex(StudentDAO.generateStudentIndex());
 //        students.add(student);
         grades =  new ArrayList<>();
-        ds.save(courses);
-        ds.save(students);
+      //  ds.save(courses);
+       // ds.save(students);
 
 
         //ds.save(grades);

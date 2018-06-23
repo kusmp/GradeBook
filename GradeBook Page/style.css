@@ -180,6 +180,7 @@ table tr:nth-child(even) td{
     background-color: #dfe4ea;
 }
 
+
 table tr:hover:nth-child(odd) td{
     background-color: #69C7BA;
 }
@@ -234,6 +235,18 @@ button{
     font-size: 12px;
 }
 
+a.button {
+    font: bold 11px Arial;
+    text-decoration: none;
+    background-color: #EEEEEE;
+    color: #333333;
+    padding: 2px 6px 2px 6px;
+    border-top: 1px solid #CCCCCC;
+    border-right: 1px solid #333333;
+    border-bottom: 1px solid #333333;
+    border-left: 1px solid #CCCCCC;
+}
+
 select{
     width: 100%;
     padding-top: 10px;
@@ -284,6 +297,12 @@ option{
         display: none;
     }
     article{
+        display: none;
+        flex: 3 1 60%;
+        padding: 0;
+        width:100%;
+    }
+    section{
         display: none;
         flex: 3 1 60%;
         padding: 0;

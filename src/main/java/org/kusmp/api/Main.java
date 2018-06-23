@@ -21,6 +21,7 @@ public class Main {
                 .register(DeclarativeLinkingFeature.class)
                 .register(RestError.class)
                 .register(DateParamConverterProvider.class)
+                .register(CustomHeaders.class)
                 .registerClasses(AuthFilter.class);
 
       //  final ResourceConfig rc = new ResourceConfig().packages("org.kusmp.api");
